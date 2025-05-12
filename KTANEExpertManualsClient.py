@@ -5,6 +5,8 @@ import webbrowser
 import socketserver
 import http.server
 import multiprocessing
+import ssl
+import certifi
 
 import asyncio
 import websockets
@@ -12,6 +14,8 @@ import json
 import typing
 
 import threading
+
+ssl_context = ssl.create_default_context(cafile=certifi.where())
 
 def start_background_loop(loop):
     asyncio.set_event_loop(loop)
@@ -33,8 +37,8 @@ PORT = 21713
 apSocket = None
 connectionResult = None
 connectionError = None
-versionNumber = "0.1.3"
-apVersion = Version(0, 5, 0)
+versionNumber = "0.1.4"
+apVersion = Version(0, 6, 0)
 
 allMods = ["The%20Button", "Wires", "Keypad", "Capacitor%20Discharge", "Complicated%20Wires", "Knob", "Maze", "Memory", "Morse%20Code", "Password", "Simon%20Says", "Venting%20Gas", "Who%27s%20on%20First", "Wire%20Sequence"]
 allModsNames = ["The Button", "Wires", "Keypad", "Capacitor", "Complicated Wires", "Knob", "Maze", "Memory", "Morse Code", "Password", "Simon Says", "Vent Gas", "Who's on First", "Wire Sequence"]
@@ -64,7 +68,7 @@ def loadPage(module, lib, playerInfo):
         '<link rel="stylesheet" type="text/css" href="https://ktane.timwi.de/HTML/css/main.css">'
     )
     ktaneUtilsPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/js/ktane-utils.js").read().decode("utf8")
-    ktaneUtilsPage = ktaneUtilsPage.replace('e.src = "../HTML/js/jquery.3.7.0.min.js"', 'e.src = "https://ktane.timwi.de/HTML/js/jquery.3.7.0.min.js"')
+    ktaneUtilsPage = ktaneUtilsPage.replace('e.src = scriptDir + "jquery.3.7.0.min.js"', 'e.src = "https://ktane.timwi.de/HTML/js/jquery.3.7.0.min.js"')
     htmlContent = htmlContent.replace(
         '<script src="js/ktane-utils.js"></script>',
         '<script>' + ktaneUtilsPage + '</script>'
@@ -113,7 +117,7 @@ def loadPage(module, lib, playerInfo):
 
 def appendicesPage():
     ktaneUtilsPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/js/ktane-utils.js").read().decode("utf8")
-    ktaneUtilsPage = ktaneUtilsPage.replace('e.src = "../HTML/js/jquery.3.7.0.min.js"', 'e.src = "https://ktane.timwi.de/HTML/js/jquery.3.7.0.min.js"')
+    ktaneUtilsPage = ktaneUtilsPage.replace('e.src = scriptDir + "jquery.3.7.0.min.js"', 'e.src = "https://ktane.timwi.de/HTML/js/jquery.3.7.0.min.js"')
     return """
     <!DOCTYPE html>
     <html lang="en">
@@ -255,7 +259,45 @@ def connectionPage(playerInfo):
                 }
             </style>
             <script>
+                function storeCookies(urlStr, portStr, nameStr) {
+                    const d = new Date();
+                    d.setTime(d.getTime() + 1209600000); //two weeks
+                    coo = "url=" + urlStr + ";port=" + portStr + ";slotName=" + nameStr + ";expires=" + d.toUTCString() + ";path=/"
+                    //document.cookie = coo;
+                    document.cookie = "url=" + urlStr + ";expires=" + d.toUTCString() + ";path=/"
+                    document.cookie = "port=" + portStr + ";expires=" + d.toUTCString() + ";path=/"
+                    document.cookie = "slotName=" + nameStr + ";expires=" + d.toUTCString() + ";path=/"
+                }
+
+                function getCookiesList() {
+                    let decodedCookies = decodeURIComponent(document.cookie);
+                    let fullCookieList = decodedCookies.split(";");
+                    const cookieList = [];
+                    cookieList["url"] = "";
+                    cookieList["port"] = "";
+                    cookieList["slotName"] = "";
+                    for(let i = 0; i < fullCookieList.length; i++) {
+                        let coo = fullCookieList[i]
+                        while (coo.charAt(0) == ' ') {
+                            coo = coo.substring(1);
+                        }
+                        cParts = coo.split("=");
+                        cookieList[cParts[0]] = cParts[1];
+                    }
+                    return cookieList;
+                }
+
                 document.addEventListener("DOMContentLoaded", function() {
+                    let myCookies = getCookiesList();
+                    if (myCookies["url"] != "") {
+                        document.getElementById("txt-server-url").value = myCookies["url"];
+                    }
+                    if (myCookies["port"] != "") {
+                        document.getElementById("txt-server-port").value = myCookies["port"];
+                    }
+                    if (myCookies["slotName"] != "") {
+                        document.getElementById("txt-slot-name").value = myCookies["slotName"];
+                    }
                     document.getElementById("connect-button").addEventListener("click", function() {
                         url = document.getElementById("txt-server-url");
                         port = document.getElementById("txt-server-port");
@@ -288,6 +330,7 @@ def connectionPage(playerInfo):
                             slotName.classList.remove("error");
                         }
                         if (filled) {
+                            storeCookies(url.value, port.value, slotName.value);
                             document.getElementById("frm-connection").submit();
                         }
                     })
@@ -463,7 +506,7 @@ def mainPage(playerInfo):
                         document.getElementById("frm-disconnect").submit();
                     });
 
-                    refreshPage();
+                    """ + ("refreshPage();" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and (len(playerInfo["unlockedModules"]) < 14)) else "") + """
                 });
 
                 """ + ("""function refreshPage() {
@@ -1405,11 +1448,14 @@ class MyHttpRequestHandler(http.server.BaseHTTPRequestHandler):
         while True:
             prefix = "" if includePrefix else ("wss://" if lastTime else "ws://")
             fullUrl = f"{prefix}{serverUrl}:{serverPort}"
-            print(fullUrl)
             try:
                 async def _inner_connect():
-                    ws = await websockets.connect(fullUrl, ping_timeout=None, ping_interval=None)
-                    return ws
+                    if "wss://" in str(fullUrl):
+                        ws = await websockets.connect(fullUrl, ssl=ssl_context, ping_timeout=None, ping_interval=None)
+                        return ws
+                    else:
+                        ws = await websockets.connect(fullUrl, ping_timeout=None, ping_interval=None)
+                        return ws
 
                 ws = await asyncio.wait_for(_inner_connect(), timeout=5)
 
