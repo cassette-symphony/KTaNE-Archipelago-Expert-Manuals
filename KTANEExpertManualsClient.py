@@ -46,7 +46,7 @@ allModsLinks = ["TheButton", "Wires", "Keypad", "Capacitor", "ComplicatedWires",
 modPages = []
 
 def loadPage(module, lib, playerInfo):
-    modPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/" + module + ".html" + ("" if playerInfo["sdRuleSeed"] == 1 else "#" + str(playerInfo["sdRuleSeed"])))
+    modPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/" + module + ".html" + ("" if playerInfo["sdRuleSeed"] == 1 else "#" + str(playerInfo["sdRuleSeed"])), context=ssl_context)
     moduleName = module.replace("%20", "").replace("%27","").replace("Discharge", "").replace("Venting", "Vent")
     htmlContent = modPage.read().decode("utf8")
     modPage.close()
@@ -67,13 +67,13 @@ def loadPage(module, lib, playerInfo):
         '<link rel="stylesheet" type="text/css" href="css/main.css">',
         '<link rel="stylesheet" type="text/css" href="https://ktane.timwi.de/HTML/css/main.css">'
     )
-    ktaneUtilsPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/js/ktane-utils.js").read().decode("utf8")
+    ktaneUtilsPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/js/ktane-utils.js", context=ssl_context).read().decode("utf8")
     ktaneUtilsPage = ktaneUtilsPage.replace('e.src = scriptDir + "jquery.3.7.0.min.js"', 'e.src = "https://ktane.timwi.de/HTML/js/jquery.3.7.0.min.js"')
     htmlContent = htmlContent.replace(
         '<script src="js/ktane-utils.js"></script>',
         '<script>' + ktaneUtilsPage + '</script>'
     )
-    ruleSeedPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/js/ruleseed.js").read().decode("utf8")
+    ruleSeedPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/js/ruleseed.js", context=ssl_context).read().decode("utf8")
     ruleSeedPage = ruleSeedPage.replace("this.seed = seed;", "this.seed = " + str(playerInfo["sdRuleSeed"]) + ";")
     ruleSeedPage = ruleSeedPage.replace('if (/^#(\\d+)$/.exec(window.location.hash) && (RegExp.$1 | 0) !== 1)', 'if (' + str(playerInfo["sdRuleSeed"] > 1).lower() + ')')
     ruleSeedPage = ruleSeedPage.replace('var seed = RegExp.$1 | 0;', 'var seed = ' + str(playerInfo["sdRuleSeed"]) + ";")
@@ -116,7 +116,7 @@ def loadPage(module, lib, playerInfo):
     print("Loaded " + moduleName)
 
 def appendicesPage():
-    ktaneUtilsPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/js/ktane-utils.js").read().decode("utf8")
+    ktaneUtilsPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/js/ktane-utils.js", context=ssl_context).read().decode("utf8")
     ktaneUtilsPage = ktaneUtilsPage.replace('e.src = scriptDir + "jquery.3.7.0.min.js"', 'e.src = "https://ktane.timwi.de/HTML/js/jquery.3.7.0.min.js"')
     return """
     <!DOCTYPE html>
