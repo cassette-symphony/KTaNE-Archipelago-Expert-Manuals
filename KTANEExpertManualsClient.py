@@ -16,6 +16,7 @@ import typing
 import threading
 
 ssl_context = ssl.create_default_context(cafile=certifi.where())
+#ssl.SSLContext.load_cert_chain()
 
 def start_background_loop(loop):
     asyncio.set_event_loop(loop)
@@ -37,23 +38,191 @@ PORT = 21713
 apSocket = None
 connectionResult = None
 connectionError = None
-versionNumber = "0.1.4"
-apVersion = Version(0, 6, 0)
+versionNumber = "0.1.5 Dev"
+apVersion = Version(0, 6, 2)
 
-allMods = ["The%20Button", "Wires", "Keypad", "Capacitor%20Discharge", "Complicated%20Wires", "Knob", "Maze", "Memory", "Morse%20Code", "Password", "Simon%20Says", "Venting%20Gas", "Who%27s%20on%20First", "Wire%20Sequence"]
+allModsRepo = {
+    "en": {
+        "TheButton": "The%20Button",
+        "Wires": "Wires",
+        "Keypad": "Keypad",
+        "Capacitor": "Capacitor%20Discharge",
+        "ComplicatedWires": "Complicated%20Wires",
+        "Knob": "Knob",
+        "Maze": "Maze",
+        "Memory": "Memory",
+        "MorseCode": "Morse%20Code",
+        "Password": "Password",
+        "SimonSays": "Simon%20Says",
+        "VentGas": "Venting%20Gas",
+        "WhosonFirst": "Who%27s%20on%20First",
+        "WireSequence": "Wire%20Sequence"
+    },
+    "cs": {
+        "TheButton": "The%20Button%20translated%20(Čeština%20—%20Tlačítko)%20originální%20modul%20(Frank%20%26%20adamcz)",
+        "Wires": "Wires%20translated%20(Čeština%20—%20Dráty)%20(Frank%20%26%20adamcz)",
+        "Keypad": "Keypad%20translated%20(Čeština%20—%20Klávesnice)%20(Frank%20%26%20adamcz)",
+        "Capacitor": "Capacitor%20Discharge%20translated%20(Čeština%20—%20Vybití%20Kondenzátoru)%20(Frank%20%26%20adamcz)",
+        "ComplicatedWires": "Complicated%20Wires%20translated%20(Čeština%20—%20Komplikované%20Dráty)%20(Frank%20%26%20adamcz)",
+        "Knob": "Knob%20translated%20(Čeština%20—%20Knoflík)%20optimalizováno%20(Frank%20%26%20adamcz)",
+        "Maze": "Maze%20translated%20(Čeština%20—%20Bludiště)%20(Frank%20%26%20adamcz)",
+        "Memory": "Memory%20translated%20(Čeština%20—%20Paměť)%20(Frank%20%26%20adamcz)",
+        "MorseCode": "Morse%20Code%20translated%20(Čeština%20—%20Morseovka)%20originální%20modul%20(Frank%20%26%20adamcz)",
+        "Password": "Password%20translated%20(Čeština%20—%20Hesla)%20originální%20modul%20(Frank%20%26%20adamcz)",
+        "SimonSays": "Simon%20Says%20translated%20(Čeština%20—%20Šimon%20Říká)%20(Frank%20%26%20adamcz)",
+        "VentGas": "Venting%20Gas%20translated%20(Čeština%20—%20Vypouštění%20Plynu)%20(Frank%20%26%20adamcz)",
+        "WhosonFirst": "Who%27s%20on%20First%20translated%20(Čeština%20—%20Kdo%20je%20první)%20originální%20modul%20(Frank,%20adamcz,%20Asmir,%20Cirax)",
+        "WireSequence": "Wire%20Sequence%20translated%20(Čeština%20—%20Posloupnost%20Drátů)%20(Frank%20%26%20adamcz)"
+    },
+    "es": {
+        "TheButton": "The%20Button%20translated%20(Español%20—%20El%20botón)%20oficial",
+        "Wires": "Wires%20translated%20(Español%20—%20Cables)",
+        "Keypad": "Keypad%20translated%20(Español%20—%20Teclado)",
+        "Capacitor": "Capacitor%20Discharge%20translated%20(Español%20—%20Descargador%20de%20condensadores)",
+        "ComplicatedWires": "Complicated%20Wires%20translated%20(Español%20—%20Cables%20complicados)",
+        "Knob": "Knob%20translated%20(Español%20—%20Interruptor%20giratorio)",
+        "Maze": "Maze%20translated%20(Español%20—%20Laberinto)",
+        "Memory": "Memory%20translated%20(Español%20—%20Memoria)",
+        "MorseCode": "Morse%20Code%20translated%20(Español%20—%20Código%20morse)%20oficial",
+        "Password": "Password%20translated%20(Español%20—%20Contraseña)%20oficial",
+        "SimonSays": "Simon%20Says%20translated%20(Español%20—%20Simón%20dice)",
+        "VentGas": "Venting%20Gas%20translated%20(Español%20—%20Pantalla%20con%20mensajes)",
+        "WhosonFirst": "Who%27s%20on%20First%20translated%20(Español%20—%20Quién%20va%20primero)%20oficial",
+        "WireSequence": "Wire%20Sequence%20translated%20(Español%20—%20Secuencia%20de%20cables)"
+    },
+    "fr": {
+        "TheButton": "The%20Button%20translated%20(Français%20—%20Le%20Bouton)%20officiel",
+        "Wires": "Wires%20translated%20(Français%20—%20Fils)",
+        "Keypad": "Keypad%20translated%20(Français%20—%20Clavier)",
+        "Capacitor": "Capacitor%20Discharge%20translated%20(Français%20—%20Condensateur)",
+        "ComplicatedWires": "Complicated%20Wires%20translated%20(Français%20—%20Fils%20compliqués)",
+        "Knob": "Knob%20translated%20(Français%20—%20Molette)",
+        "Maze": "Maze%20translated%20(Français%20—%20Labyrinthe)",
+        "Memory": "Memory%20translated%20(Français%20—%20Memory)",
+        "MorseCode": "Morse%20Code%20translated%20(Français%20—%20Code%20Morse)%20officiel",
+        "Password": "Password%20translated%20(Français%20—%20Mot%20de%20Passe)%20officiel",
+        "SimonSays": "Simon%20Says%20translated%20(Français%20—%20Simon)",
+        "VentGas": "Venting%20Gas%20translated%20(Français%20—%20Évacuation%20du%20gaz)",
+        "WhosonFirst": "Who%27s%20on%20First%20translated%20(Français%20—%20Jeux%20de%20Mots)%20officiel",
+        "WireSequence": "Wire%20Sequence%20translated%20(Français%20—%20Séquences%20de%20fils)"
+    },
+    "ja": {
+        "TheButton": "The%20Button%20translated%20(日本語%20—%20ボタン)",
+        "Wires": "Wires%20translated%20(日本語%20—%20ワイヤ)",
+        "Keypad": "Keypad%20translated%20(日本語%20—%20キーパッド)",
+        "Capacitor": "Capacitor%20Discharge%20translated%20(日本語%20—%20コンデンサー)",
+        "ComplicatedWires": "Complicated%20Wires%20translated%20(日本語%20—%20複雑ワイヤ)",
+        "Knob": "Knob%20translated%20(日本語%20—%20ダイヤル)",
+        "Maze": "Maze%20translated%20(日本語%20—%20迷路)",
+        "Memory": "Memory%20translated%20(日本語%20—%20記憶)",
+        "MorseCode": "Morse%20Code%20translated%20(日本語%20—%20モールス信号)",
+        "Password": "Password%20translated%20(日本語%20—%20パスワード)",
+        "SimonSays": "Simon%20Says%20translated%20(日本語%20—%20サイモンゲーム)",
+        "VentGas": "Venting%20Gas%20translated%20(日本語%20—%20ガス放出)",
+        "WhosonFirst": "Who%27s%20on%20First%20translated%20(日本語%20—%20表比較)",
+        "WireSequence": "Wire%20Sequence%20translated%20(日本語%20—%20順番ワイヤ)"
+    },
+    "nl": {
+        "TheButton": "The%20Button%20translated%20(Nederlands%20—%20De%20knop)",
+        "Wires": "Wires%20translated%20(Nederlands%20—%20Draden)",
+        "Keypad": "Keypad%20translated%20(Nederlands%20—%20Toetsenpanelen)",
+        "ComplicatedWires": "Complicated%20Wires%20translated%20(Nederlands%20—%20Ingewikkelde%20Draden)",
+        "Maze": "Maze%20translated%20(Nederlands%20—%20Doolhof)",
+        "Memory": "Memory%20translated%20(Nederlands%20—%20Memory)",
+        "MorseCode": "Morse%20Code%20translated%20(Nederlands%20—%20Morse-codering)",
+        "Password": "Password%20translated%20(Nederlands%20—%20Wachtwoorden)",
+        "SimonSays": "Simon%20Says%20translated%20(Nederlands%20—%20Simon%20Zegt)",
+        "WhosonFirst": "Who%27s%20on%20First%20translated%20(Nederlands%20—%20Who%27s%20on%20First)",
+        "WireSequence": "Wire%20Sequence%20translated%20(Nederlands%20—%20Dradenreeks)"
+    },
+    "pl": {
+        "TheButton": "The%20Button%20translated%20(Polski%20—%20Przycisk)",
+        "Wires": "Wires%20translated%20(Polski%20—%20Przewody)",
+        "Keypad": "Keypad%20translated%20(Polski%20—%20Klawiatura)",
+        "Capacitor": "Capacitor%20Discharge%20translated%20(Polski%20—%20Rozładowywanie%20Kondensatora)",
+        "ComplicatedWires": "Complicated%20Wires%20translated%20(Polski%20—%20Skomplikowane%20Przewody)",
+        "Knob": "Knob%20translated%20(Polski%20—%20Gałka)",
+        "Maze": "Maze%20translated%20(Polski%20—%20Labirynt)",
+        "Memory": "Memory%20translated%20(Polski%20—%20Pamięć)",
+        "MorseCode": "Morse%20Code%20translated%20(Polski%20—%20Alfabet%20Morse%27a)",
+        "Password": "Password%20translated%20(Polski%20—%20Hasło)",
+        "SimonSays": "Simon%20Says%20translated%20(Polski%20—%20Simon%20Mówi)",
+        "VentGas": "Venting%20Gas%20translated%20(Polski%20—%20Wietrzenie%20Gazu)",
+        "WhosonFirst": "Who%27s%20on%20First%20translated%20(Polski%20—%20Kto%20Jest%20Na%20Pierwszym)",
+        "WireSequence": "Wire%20Sequence%20translated%20(Polski%20—%20Sekwencja%20Przewodów)"
+    },
+    "ru": {
+        "TheButton": "The%20Button%20translated%20(Русский%20—%20Кнопка)%20оригинальный",
+        "Wires": "Wires%20translated%20(Русский%20—%20Провода)",
+        "Keypad": "Keypad%20translated%20(Русский%20—%20Клавиатура)%20оригинальный",
+        "Capacitor": "Capacitor%20Discharge%20translated%20(Русский%20—%20Разрядка%20конденсатора)",
+        "ComplicatedWires": "Complicated%20Wires%20translated%20(Русский%20—%20Сложные%20провода)",
+        "Knob": "Knob%20translated%20(Русский%20—%20Поворотная%20ручка)",
+        "Maze": "Maze%20translated%20(Русский%20—%20Лабиринт)",
+        "Memory": "Memory%20translated%20(Русский%20—%20Память)",
+        "MorseCode": "Morse%20Code%20translated%20(Русский%20—%20Азбука%20Морзе)%20оригинальный",
+        "Password": "Password%20translated%20(Русский%20—%20Пароль)%20оригинальный",
+        "SimonSays": "Simon%20Says%20translated%20(Русский%20—%20Саймон%20говорит)",
+        "VentGas": "Venting%20Gas%20translated%20(Русский%20—%20Выпуск%20газа)",
+        "WhosonFirst": "Who%27s%20on%20First%20translated%20(Русский%20—%20Меня%20зовут%20Авас,%20а%20вас？)%20оригинальный",
+        "WireSequence": "Wire%20Sequence%20translated%20(Русский%20—%20Последовательность%20проводов)"
+    },
+    #"pt-BR": [],
+    #"zh-CN": [],
+    #"da": [],
+    #"de": [],
+    #"eo": [],
+    #"et": [],
+    #"fi": [],
+    #"he": [],
+    #"it": [],
+    #"ko": [],
+    #"no": [],
+    #"sv": [],
+    #"th": []
+}
+
 allModsNames = ["The Button", "Wires", "Keypad", "Capacitor", "Complicated Wires", "Knob", "Maze", "Memory", "Morse Code", "Password", "Simon Says", "Vent Gas", "Who's on First", "Wire Sequence"]
 allModsLinks = ["TheButton", "Wires", "Keypad", "Capacitor", "ComplicatedWires", "Knob", "Maze", "Memory", "MorseCode", "Password", "SimonSays", "VentGas", "WhosonFirst", "WireSequence"]
 modPages = []
 
-def loadPage(module, lib, playerInfo):
-    modPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/" + module + ".html" + ("" if playerInfo["sdRuleSeed"] == 1 else "#" + str(playerInfo["sdRuleSeed"])), context=ssl_context)
-    moduleName = module.replace("%20", "").replace("%27","").replace("Discharge", "").replace("Venting", "Vent")
+def loadPage(moduleName, lib, playerInfo):
+    module = ""
+    if moduleName in list(allModsRepo[playerInfo["sdLanguage"]].keys()):
+        module = allModsRepo[playerInfo["sdLanguage"]][moduleName]
+    else:
+        module = allModsRepo["en"][moduleName]
+    fullUrl = "https://ktane.timwi.de/HTML/" + module + ".html" + ("" if playerInfo["sdRuleSeed"] == 1 else "#" + str(playerInfo["sdRuleSeed"]))
+    fullUrl = fullUrl.replace("%20", " ").replace("%26", "&").replace("%27", "'")
+
+    #encoding fix
+    parts = urllib.parse.urlsplit(fullUrl)
+    encoded_path = urllib.parse.quote(parts.path)
+    encoded_query = urllib.parse.quote(parts.query, safe="=&")
+    encodedFullUrl = urllib.parse.urlunsplit((parts.scheme, parts.netloc, encoded_path, encoded_query, parts.fragment))
+
+    modPage = urllib.request.urlopen(encodedFullUrl, context=ssl_context)
     htmlContent = modPage.read().decode("utf8")
     modPage.close()
 
     htmlContent = htmlContent.replace(
         '<link rel="stylesheet" type="text/css" href="css/font.css">',
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">'
+    )
+    #CORS problem
+    #russianFontCss = urllib.request.urlopen("https://ktane.timwi.de/HTML/css/font-cyrillic.css", context=ssl_context).read().decode("utf8")
+    #russianFontCss = russianFontCss.replace("..", "https://ktane.timwi.de/HTML")
+    #htmlContent = htmlContent.replace(
+    #    '<link rel="stylesheet" type="text/css" href="css/font-cyrillic.css">',
+    #    '<style>' + russianFontCss + "</style>"
+    #)
+    #htmlContent = htmlContent.replace(
+    #    '<link rel="stylesheet" type="text/css" href="https://ktane.timwi.de/HTML/css/font-cyrillic.css">',
+    #    '<style>' + russianFontCss + "</style>"
+    #)
+    htmlContent = htmlContent.replace(
+        '<link rel="stylesheet" type="text/css" href="css/font-cyrillic.css">',
+        '<link rel="stylesheet" type="text/css" href="https://ktane.timwi.de/HTML/css/font-cyrillic.css">'
     )
     htmlContent = htmlContent.replace(
         '<link rel="stylesheet" type="text/css" href="css/normalize.css">',
@@ -85,6 +254,10 @@ def loadPage(module, lib, playerInfo):
         "<script>" + ruleSeedPage + "</script>"
     )
     htmlContent = htmlContent.replace(
+        '<script src="js/ruleseed.js"></script>',
+        "<script>" + ruleSeedPage + "</script>"
+    )
+    htmlContent = htmlContent.replace(
         '<script src="js/jquery.3.7.0.min.js"></script>',
         '<script src="https://ktane.timwi.de/HTML/js/jquery.3.7.0.min.js"></script>'
     )
@@ -101,12 +274,12 @@ def loadPage(module, lib, playerInfo):
         'https://ktane.timwi.de/HTML/img/Keypad/'
     )
     htmlContent = htmlContent.replace(
-        'url("img/Who',
-        'url("https://ktane.timwi.de/HTML/img/Who'
+        'img/Who',
+        'https://ktane.timwi.de/HTML/img/Who'
     )
     htmlContent = htmlContent.replace(
-        '<img id="morseSignalImg" src="img/Morse',
-        '<img id="morseSignalImg" src="https://ktane.timwi.de/HTML/img/Morse'
+        'img/Morse',
+        'https://ktane.timwi.de/HTML/img/Morse'
     )
     htmlContent = htmlContent.replace(
         "console.log('seed = ' + rnd.seed);",
@@ -115,9 +288,229 @@ def loadPage(module, lib, playerInfo):
     lib[moduleName] = htmlContent
     print("Loaded " + moduleName)
 
-def appendicesPage():
+def appendicesPage(lang):
     ktaneUtilsPage = urllib.request.urlopen("https://ktane.timwi.de/HTML/js/ktane-utils.js", context=ssl_context).read().decode("utf8")
     ktaneUtilsPage = ktaneUtilsPage.replace('e.src = scriptDir + "jquery.3.7.0.min.js"', 'e.src = "https://ktane.timwi.de/HTML/js/jquery.3.7.0.min.js"')
+    appLoc = {
+        "en": [
+            "Indicators",
+            "Appendix A: Indicator Identification Reference",
+            "Labelled indicator lights can be found on the sides of the bomb casing.",
+            "Common Indicators",
+            "Page 1 of 3",
+            "Batteries",
+            "Appendix B: Battery Identification Reference",
+            "Common battery types can be found within enclosures on the sides of the bomb casing.",
+            "Battery",
+            "Type",
+            "AA",
+            "D",
+            "Page 2 of 3",
+            "Ports",
+            "Appendix C: Port Identification Reference",
+            "Digital and analog ports can be found on sides of the bomb casing.",
+            "Port",
+            "Name",
+            "DVI-D",
+            "Parallel",
+            "PS/2",
+            "RJ-45",
+            "Serial",
+            "Stereo RCA",
+            "Page 3 of 3"
+        ],
+        "cs": [
+            "Indikátory (čeština) v1.4",
+            "Dodatek A: Instrukce k identifikaci indikátorů (čeština)",
+            "Pojmenované světelné indikátory jsou na stranách bomby.",
+            "Běžné indikátory:",
+            "Strana 1 z 3",
+            "Baterie (čeština) v1.4",
+            "Dodatek B: Instrukce k identifikaci baterií (čeština)",
+            "Běžné typy baterií mohou být nalezeny v držácích na stranách krytu bomby.",
+            "Baterie",
+            "Typ",
+            "AA",
+            "D",
+            "Strana 2 z 3",
+            "Porty (čeština) v1.4",
+            "Dodatek C: Instrukce k identifikaci portů (čeština)",
+            "Digitální a analogové porty se mohou nacházet na stranách bomby.",
+            "Port",
+            "Jméno",
+            "DVI-D",
+            "Paralelní",
+            "PS/2",
+            "RJ-45",
+            "Sériový",
+            "Stereo RCA",
+            "Strana 3 z 3"
+        ],
+        "es": [
+            "Indicadores",
+            "Apéndice A: Identificación del indicador",
+            "Los indicadores lumínicos etiquetados se pueden encontrar a los lados de la carcasa de la bomba.",
+            "Indicadores comunes",
+            "Página 1 de 3",
+            "Baterías",
+            "Apéndice B: Identificación de la batería",
+            "Se pueden encontrar tipos de baterías comunes conectadas a los lados de la carcasa de la bomba.",
+            "Batería",
+            "Tipo",
+            "AA",
+            "D",
+            "Página 2 de 3",
+            "Puertos",
+            "Apéndice C: Identificación del puerto",
+            "Los puertos analógicos y digitales se pueden encontrar a los lados de la carcasa de la bomba.",
+            "Puerto",
+            "Nombre",
+            "DVI-D",
+            "Paralelo",
+            "PS/2",
+            "RJ-45",
+            "Serial",
+            "RCA estéreo",
+            "Página 3 de 3"
+        ],
+        "fr": [
+            "Indicateurs",
+            "Annexe A : Identification des Indicateurs",
+            "Des indicateurs, composés d’un libellé et d’une lumière, peuvent se trouver sur les côtés de la bombe.",
+            "Indicateurs ordinaires :",
+            "Page 1 sur 3",
+            "Piles",
+            "Annexe B : Identification des Piles",
+            "Des piles aux formats ordinaires peuvent se trouver sur les côtés de la bombe.",
+            "Pile",
+            "Type",
+            "AA",
+            "D",
+            "Page 2 sur 3",
+            "Ports",
+            "Annexe C : Identification des Ports",
+            "Des ports numériques et analogiques peuvent se trouver sur les côtés de la bombe.",
+            "Port",
+            "Nom",
+            "DVI-D",
+            "Parallèle",
+            "PS/2",
+            "RJ-45",
+            "Série",
+            "Stéréo RCA",
+            "Page 3 sur 3"
+        ],
+        "ja": [
+            "付録A",
+            "付録A：インジケーター確認表",
+            "ケースの側面にはインジケーターがついていることがある。",
+            "インジケーター例",
+            "ページ 1/3",
+            "付録B",
+            "付録B：バッテリー確認表",
+            "ケースの側面には一般的な電池がついていることがある。",
+            "バッテリー",
+            "種類",
+            "単3",
+            "単1",
+            "ページ 2/3",
+            "付録C",
+            "付録C：ポート確認表",
+            "ケースの側面には各種のデジタル・アナログポートがついていることがある。",
+            "ポート",
+            "名称",
+            "DVI-D",
+            "パラレル",
+            "PS/2",
+            "RJ-45",
+            "シリアル",
+            "ステレオRCA",
+            "ページ 3/3"
+        ],
+        "nl": [
+            "Indicators",
+            "Bijlage A: Indicatoridentificatie",
+            "Gelabelde indicatorlichten kunnen aan de zijkant van de bom worden gevonden.",
+            "Gebruikelijke Indicatoren",
+            "Pagina 1 van 3",
+            "Batterijen",
+            "Bijlage B: Batterijidentificatie",
+            "Gebruikelijke batterijsoorten kunnen aan de zijkanten van de bom worden gevonden.",
+            "Batterij",
+            "Type",
+            "AA",
+            "D",
+            "Pagina 2 van 3",
+            "Poorten",
+            "Bijlage C: Poortidentificatie",
+            "Deigitale en analoge poorten kunnen aan de zijkanten van de bom worden gevonden.",
+            "Poort",
+            "Naam",
+            "DVI-D",
+            "Parallel",
+            "PS/2",
+            "RJ-45",
+            "Serieel",
+            "Stereo RCA",
+            "Pagina 3 van 3"
+        ],
+        "pl": [
+            "Wskaźniki",
+            "Załącznik A: Rozpoznawanie wskaźników",
+            "Wskaźniki opatrzone napisami można znaleźć na bocznych ścianach obudowy bomby.",
+            "Powszechne wskaźniki",
+            "Strona 1 z 3",
+            "Baterie",
+            "Załącznik B: Rozpoznawanie baterii",
+            "Popularne typy baterii można znaleźć w gniazdach na bocznych ścianach obudowy bomby.",
+            "Bateria",
+            "Typ",
+            "AA",
+            "D",
+            "Strona 2 z 3",
+            "Porty",
+            "Załącznik C: Rozpoznawanie portów",
+            "Porty cyfrowe i analogowe można znaleźć na bocznych ścianach obudowy bomby.",
+            "Port",
+            "Nazwa",
+            "DVI-D",
+            "Równoległy",
+            "PS/2",
+            "RJ-45",
+            "Szeregowy",
+            "Stereo RCA",
+            "Strona 3 z 3"
+        ],
+        "ru": [
+            "Индикаторы",
+            "Приложение A: Определение индикатора",
+            "По бокам корпуса бомбы можно обнаружить подписанные световые индикаторы.",
+            "Часто встречающиеся индикаторы",
+            "Стр. 1 из 3",
+            "Элементы питания",
+            "Приложение B: Определение элемента питания",
+            "По бокам корпуса бомбы можно обнаружить стандартные элементы питания.",
+            "Элемент питания",
+            "Тип",
+            "AA",
+            "D",
+            "Стр. 2 из 3",
+            "Порты",
+            "Приложение C: Определение порта",
+            "По бокам корпуса бомбы можно обнаружить цифровые и аналоговые порты.",
+            "Порт",
+            "Название",
+            "DVI-D",
+            "Параллельный",
+            "PS/2",
+            "RJ-45",
+            "Последовательный/Серийный",
+            "Двухканальный RCA",
+            "Стр. 3 из 3"
+        ]
+    }
+    if lang not in list(appLoc.keys()):
+        lang = "en"
     return """
     <!DOCTYPE html>
     <html lang="en">
@@ -135,59 +528,59 @@ def appendicesPage():
             .dark td img { filter: invert(87%); }
             .dark img { filter: invert(87%); }
         </style>
-    </head>
+    </head>""" + f"""
     <body>
         <div class="section">
             <div class="page page-bg-07 appendix-indicators">
                 <div class="page-header">
                     <span class="page-header-doc-title">Keep Talking and Nobody Explodes</span>
-                    <span class="page-header-section-title">Indicators</span>
+                    <span class="page-header-section-title">{appLoc[lang][0]}</span>
                 </div>
                 <div class="page-content">
-                    <h2>Appendix A: Indicator Identification Reference</h2>
-                    <p>Labelled indicator lights can be found on the sides of the bomb casing.</p>
+                    <h2>{appLoc[lang][1]}</h2>
+                    <p>{appLoc[lang][2]}</p>
                     <img src="https://ktane.timwi.de/HTML/img/Component/IndicatorWidget.svg" style="height: 5em; display: block; margin: .6em 0 0">
-                    <h3>Common Indicators</h3>
+                    <h3>{appLoc[lang][3]}</h3>
                     <ul><li>SND</li><li>CLR</li><li>CAR</li><li>IND</li><li>FRQ</li><li>SIG</li><li>NSA</li><li>MSA</li><li>TRN</li><li>BOB</li><li>FRK</li></ul>
                 </div>
-                <div class="page-footer relative-footer">Page 1 of 3</div>
+                <div class="page-footer relative-footer">{appLoc[lang][4]}</div>
             </div>
         </div>
         <div class="page page-bg-01 appendix-batteries">
             <div class="page-header">
                 <span class="page-header-doc-title">Keep Talking and Nobody Explodes</span>
-                <span class="page-header-section-title">Batteries</span>
+                <span class="page-header-section-title">{appLoc[lang][5]}</span>
             </div>
             <div class="page-content">
-                <h2>Appendix B: Battery Identification Reference</h2>
-                <p>Common battery types can be found within enclosures on the sides of the bomb casing.</p>
+                <h2>{appLoc[lang][6]}</h2>
+                <p>{appLoc[lang][7]}</p>
                 <table style="margin-top: 1em">
-                    <tr><th>Battery</th><th>Type</th></tr>
-                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-batteries/Battery-AA.svg" style="width: 4.09375em; height: 6.18125em"></td><td>AA</td></tr>
-                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-batteries/Battery-D.svg" style="width: 4.09375em; height: 5.553125em"></td><td>D</td></tr>
+                    <tr><th>{appLoc[lang][8]}</th><th>{appLoc[lang][9]}</th></tr>
+                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-batteries/Battery-AA.svg" style="width: 4.09375em; height: 6.18125em"></td><td>{appLoc[lang][10]}</td></tr>
+                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-batteries/Battery-D.svg" style="width: 4.09375em; height: 5.553125em"></td><td>{appLoc[lang][11]}</td></tr>
                 </table>
             </div>
-            <div class="page-footer relative-footer">Page 2 of 3</div>
+            <div class="page-footer relative-footer">{appLoc[lang][12]}</div>
         </div>
         <div class="page page-bg-02 appendix-ports">
             <div class="page-header">
                 <span class="page-header-doc-title">Keep Talking and Nobody Explodes</span>
-                <span class="page-header-section-title">Ports</span>
+                <span class="page-header-section-title">{appLoc[lang][13]}</span>
             </div>
             <div class="page-content">
-                <h2>Appendix C: Port Identification Reference</h2>
-                <p>Digital and analog ports can be found on sides of the bomb casing.</p>
+                <h2>{appLoc[lang][14]}</h2>
+                <p>{appLoc[lang][15]}</p>
                 <table>
-                    <tr><th>Port</th><th>Name</th></tr>
-                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/DVI-D.svg" style="height:60px"></td><td>DVI-D</td></tr>
-                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/Parallel.svg" style="height:60px"></td><td>Parallel</td></tr>
-                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/PS2.svg"></td><td>PS/2</td></tr>
-                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/RJ-45.svg"></td><td>RJ-45</td></tr>
-                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/Serial.svg" style="height:60px"></td><td>Serial</td></tr>
-                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/Stereo RCA.svg"></td><td>Stereo RCA</td></tr>
+                    <tr><th>{appLoc[lang][16]}</th><th>{appLoc[lang][17]}</th></tr>
+                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/DVI-D.svg" style="height:60px"></td><td>{appLoc[lang][18]}</td></tr>
+                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/Parallel.svg" style="height:60px"></td><td>{appLoc[lang][19]}</td></tr>
+                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/PS2.svg"></td><td>{appLoc[lang][20]}</td></tr>
+                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/RJ-45.svg"></td><td>{appLoc[lang][21]}</td></tr>
+                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/Serial.svg" style="height:60px"></td><td>{appLoc[lang][22]}</td></tr>
+                    <tr><td><img src="https://ktane.timwi.de/HTML/img/appendix-ports/Stereo RCA.svg"></td><td>{appLoc[lang][23]}</td></tr>
                 </table>
             </div>
-            <div class="page-footer relative-footer">Page 3 of 3</div>
+            <div class="page-footer relative-footer">{appLoc[lang][24]}</div>
         </div>
     </body>
     </html>
@@ -199,6 +592,7 @@ def connectionPage(playerInfo):
     <html>
         <head>
             <title>AP KTANE - Connection</title>
+            <meta charset="UTF-8">
 
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
             <link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
@@ -353,7 +747,7 @@ def connectionPage(playerInfo):
                 <div class="row">
                     <div class="col-0 col-lg-2"></div>
                     <div class="col-12 col-lg-8">
-                        <form method="POST" id="frm-connection">
+                        <form method="POST" id="frm-connection" accept-charset="UTF-8">
                             <input type="hidden" name="post-command" value="connect">
                             <div class="container connection-section">
                                 <div class="row">
@@ -419,6 +813,7 @@ def mainPage(playerInfo):
     <html>
         <head>
             <title>AP KTANE - Main Page</title>
+            <meta charset="UTF-8">
 
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
             <link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
@@ -1519,6 +1914,7 @@ class MyHttpRequestHandler(http.server.BaseHTTPRequestHandler):
             self.playerInfo["sdRuleSeed"] = 1
             self.playerInfo["sdRandomRuleSeed"] = False
             self.playerInfo["sdHardlockModules"] = True
+            self.playerInfo["sdLanguage"] = "en"
         else:
             sd = apConData["slot_data"]
             if "rule_seed" in sd.keys():
@@ -1542,6 +1938,13 @@ class MyHttpRequestHandler(http.server.BaseHTTPRequestHandler):
                     self.playerInfo["sdHardlockModules"] = (sd["hardlock_modules"] == 1)
             else:
                 self.playerInfo["sdHardlockModules"] = True
+            if "manuals_language" in sd.keys():
+                if sd["manuals_language"] is None:
+                    self.playerInfo["sdLanguage"] = "en"
+                else:
+                    self.playerInfo["sdLanguage"] = list(allModsRepo.keys())[sd["manuals_language"]]
+            else:
+                self.playerInfo["sdLanguage"] = "en"
         if not self.playerInfo["sdHardlockModules"]:
             self.playerInfo["unlockedModules"] += ["Capacitor", "VentGas"]
         self.playerInfo["connectionResult"] = "success"
@@ -1559,6 +1962,7 @@ class MyHttpRequestHandler(http.server.BaseHTTPRequestHandler):
         self.playerInfo["sdRuleSeed"] = -1
         self.playerInfo["sdRandomRuleSeed"] = False
         self.playerInfo["sdHardlockModules"] = True
+        self.playerInfo["sdLanguage"] = "en"
         self.playerInfo["unlockedModules"] = ["TheButton", "Keypad", "Wires"]
         self.playerInfo["connectionResult"] = None
         self.playerInfo["connectionError"] = ["", ""]
@@ -1611,7 +2015,7 @@ class MyHttpRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.wfile.write(badPostPage().encode("utf8"))
             elif (self.path == "/Appendices"):
                 self._inner_func()
-                self.wfile.write(appendicesPage().encode("utf8"))
+                self.wfile.write(appendicesPage(self.playerInfo["sdLanguage"]).encode("utf8"))
             elif self.path[1:] in allModsLinks:
                 self._inner_func()
                 if self.playerInfo["name"] == "":
@@ -1658,7 +2062,7 @@ def setModPages(playerInfo):
     global modPages
     modPages = multiprocessing.Manager().dict()
     threadList = []
-    for module in allMods:
+    for module in allModsLinks:
         p = multiprocessing.Process(target=loadPage, args=(module, modPages, playerInfo))
         p.start()
         threadList.append(p)
@@ -1688,6 +2092,7 @@ if __name__ == "__main__":
     playerInfo["sdRuleSeed"] = -1
     playerInfo["sdRandomRuleSeed"] = False
     playerInfo["sdHardlockModules"] = True
+    playerInfo["sdLanguage"] = "en"
     playerInfo["connected"] = False
     playerInfo["unlockedModules"] = ["TheButton", "Keypad", "Wires"]
     playerInfo["connectionResult"] = None
