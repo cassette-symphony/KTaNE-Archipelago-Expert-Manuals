@@ -38,8 +38,8 @@ PORT = 21713
 apSocket = None
 connectionResult = None
 connectionError = None
-versionNumber = "0.1.5 Dev"
-apVersion = Version(0, 6, 2)
+versionNumber = "0.2.0"
+apVersion = Version(0, 6, 3)
 
 allModsRepo = {
     "en": {
