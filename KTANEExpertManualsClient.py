@@ -937,7 +937,7 @@ def mainPage(playerInfo):
                             <div class="row">
                                 <div class="col-0 col-md-11"></div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/TheButton" target="_blank">
+                                    <a href="/TheButton" target="_blank">
                                         <div class="container module unlocked">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -951,7 +951,7 @@ def mainPage(playerInfo):
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/Keypad" target="_blank">
+                                    <a href="/Keypad" target="_blank">
                                         <div class="container module unlocked">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -965,7 +965,7 @@ def mainPage(playerInfo):
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/Wires" target="_blank">
+                                    <a href="/Wires" target="_blank">
                                         <div class="container module unlocked">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -982,7 +982,7 @@ def mainPage(playerInfo):
                             </div>
                             <div class="row">
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/Maze" target="_blank">
+                                    <a href="/Maze" target="_blank">
                                         <div class="container module {"unlocked" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and ("Maze" in playerInfo["unlockedModules"]))else ""}">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -996,7 +996,7 @@ def mainPage(playerInfo):
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/Memory" target="_blank">
+                                    <a href="/Memory" target="_blank">
                                         <div class="container module {"unlocked" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and ("Memory" in playerInfo["unlockedModules"]))else ""}">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -1010,7 +1010,7 @@ def mainPage(playerInfo):
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/SimonSays" target="_blank">
+                                    <a href="/SimonSays" target="_blank">
                                         <div class="container module {"unlocked" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and ("SimonSays" in playerInfo["unlockedModules"]))else ""}">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -1024,7 +1024,7 @@ def mainPage(playerInfo):
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/WhosonFirst" target="_blank">
+                                    <a href="/WhosonFirst" target="_blank">
                                         <div class="container module  {"unlocked" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and ("WhosonFirst" in playerInfo["unlockedModules"]))else ""}">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -1040,7 +1040,7 @@ def mainPage(playerInfo):
                             </div>
                             <div class="row">
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/ComplicatedWires" target="_blank">
+                                    <a href="/ComplicatedWires" target="_blank">
                                         <div class="container module {"unlocked" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and ("ComplicatedWires" in playerInfo["unlockedModules"]))else ""}">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -1054,7 +1054,7 @@ def mainPage(playerInfo):
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/MorseCode" target="_blank">
+                                    <a href="/MorseCode" target="_blank">
                                         <div class="container module {"unlocked" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and ("MorseCode" in playerInfo["unlockedModules"]))else ""}">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -1068,7 +1068,7 @@ def mainPage(playerInfo):
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/Password" target="_blank">
+                                    <a href="/Password" target="_blank">
                                         <div class="container module {"unlocked" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and ("Password" in playerInfo["unlockedModules"]))else ""}">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -1082,7 +1082,7 @@ def mainPage(playerInfo):
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/WireSequence" target="_blank">
+                                    <a href="/WireSequence" target="_blank">
                                         <div class="container module {"unlocked" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and ("WireSequence" in playerInfo["unlockedModules"]))else ""}">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -1098,7 +1098,7 @@ def mainPage(playerInfo):
                             </div>
                             <div class="row">
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/Capacitor" target="_blank">
+                                    <a href="/Capacitor" target="_blank">
                                         <div class="container module {"unlocked" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and ("Capacitor" in playerInfo["unlockedModules"]))else ""}">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -1112,7 +1112,7 @@ def mainPage(playerInfo):
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/Knob" target="_blank">
+                                    <a href="/Knob" target="_blank">
                                         <div class="container module {"unlocked" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and ("Knob" in playerInfo["unlockedModules"]))else ""}">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -1126,7 +1126,7 @@ def mainPage(playerInfo):
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/VentGas" target="_blank">
+                                    <a href="/VentGas" target="_blank">
                                         <div class="container module {"unlocked" if ((playerInfo is not None) and ("unlockedModules" in playerInfo.keys()) and ("VentGas" in playerInfo["unlockedModules"]))else ""}">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -1140,7 +1140,7 @@ def mainPage(playerInfo):
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-3 padding-correction">
-                                    <a href="http://localhost:{PORT}/Appendices" target="_blank">
+                                    <a href="/Appendices" target="_blank">
                                         <div class="container module unlocked">
                                             <div class="row">
                                                 <div class="col-3 col-sm-2 col-md-12">
@@ -1825,13 +1825,13 @@ class MyHttpRequestHandler(http.server.BaseHTTPRequestHandler):
         if (self.playerInfo["connectionResult"] == "success"):
             setModPages(self.playerInfo)
 
-            new_path = "http://localhost:" + str(PORT) + "/MainPage"
+            new_path = "/MainPage"
             self.send_response(303)
             self.send_header("Location", new_path)
             self._send_cors_headers()
             self.end_headers()
         else:
-            new_path = "http://localhost:" + str(PORT) + "/Error"
+            new_path = "/Error"
             self.send_response(303)
             self.send_header("Location", new_path)
             self._send_cors_headers()
@@ -1967,21 +1967,21 @@ class MyHttpRequestHandler(http.server.BaseHTTPRequestHandler):
         self.playerInfo["connectionResult"] = None
         self.playerInfo["connectionError"] = ["", ""]
 
-        new_path = "http://localhost:" + str(PORT)
+        new_path = "/"
         self.send_response(303)
         self.send_header("Location", new_path)
         self._send_cors_headers()
         self.end_headers()
 
     def _return_to_main_page(self, post_data):
-        new_path = "http://localhost:" + str(PORT)
+        new_path = "/"
         self.send_response(303)
         self.send_header("Location", new_path)
         self._send_cors_headers()
         self.end_headers()
 
     def _wrong_post(self, post_data):
-        new_path = "http://localhost:" + str(PORT) + "/WrongPost"
+        new_path = "/WrongPost"
         self.send_response(303)
         self.send_header("Location", new_path)
         self._send_cors_headers()
@@ -1992,7 +1992,7 @@ class MyHttpRequestHandler(http.server.BaseHTTPRequestHandler):
             if self.path == "/":
                 if self.playerInfo["name"] != "":
                     #already connected
-                    new_path = "http://localhost:" + str(PORT) + "/MainPage"
+                    new_path = "/MainPage"
                     self.send_response(303)
                     self.send_header("Location", new_path)
                     self._send_cors_headers()
